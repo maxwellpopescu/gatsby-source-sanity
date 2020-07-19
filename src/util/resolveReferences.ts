@@ -6,11 +6,13 @@ import {unprefixDraftId} from './unprefixDraftId'
 const defaultResolveOptions: ResolveReferencesOptions = {
   maxDepth: 5,
   overlayDrafts: false,
+  filterResolvedReferences: obj => obj,
 }
 
 interface ResolveReferencesOptions {
   maxDepth: number
   overlayDrafts: boolean
+  filterResolvedReferences: (obj: {[key: string]: any}) => {[key: string]: any}
 }
 
 // NOTE: This is now a public API and should be treated as such
@@ -22,7 +24,7 @@ export function resolveReferences(
 ): any {
   const {createNodeId, getNode} = context
   const resolveOptions = {...defaultResolveOptions, ...options}
-  const {overlayDrafts, maxDepth} = resolveOptions
+  const {overlayDrafts, maxDepth, filterResolvedReferences} = resolveOptions
 
   if (Array.isArray(obj)) {
     return currentDepth <= maxDepth
@@ -53,7 +55,12 @@ export function resolveReferences(
     }
 
     return node && currentDepth <= maxDepth
-      ? resolveReferences(remapRawFields(node), context, resolveOptions, currentDepth + 1)
+      ? resolveReferences(
+          filterResolvedReferences(remapRawFields(node)),
+          context,
+          resolveOptions,
+          currentDepth + 1,
+        )
       : obj
   }
 
