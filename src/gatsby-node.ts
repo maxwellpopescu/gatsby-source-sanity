@@ -49,6 +49,7 @@ export interface PluginConfig extends PluginOptions {
   graphqlTag: string
   overlayDrafts?: boolean
   watchMode?: boolean
+  filterResolvedReferences: (obj: {[key: string]: any}) => {[key: string]: any}
 }
 
 const defaultConfig = {
